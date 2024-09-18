@@ -15,7 +15,9 @@
       "@/*": ["./src/*"]
     },
     "types": ["vite-plugin-pwa/client"],
-    "lib": ["ESNext", "DOM", "WebWorker"]
+    "lib": ["ESNext", "DOM", "WebWorker"],
+    "jsx": "preserve",
+    "jsxImportSource": "vue"
   },
 
   "references": [
