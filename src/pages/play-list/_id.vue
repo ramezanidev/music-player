@@ -19,7 +19,7 @@ const getData = async (url: string) => {
     result.firstLoad && (loading.value = true);
     try {
         const { data } = await axios.get(url)
-        result.songs = [...result.songs, ...data.results]
+        result.songs = [...result.songs, ...data.data]
         fetchError.value = false
         result.firstLoad = false
     } catch (error) {
@@ -30,8 +30,7 @@ const getData = async (url: string) => {
 }
 
 const loadMore = () => {
-    page.value += 20
-    getData(`https://api-beta.melobit.com/v1/song/genre/downloads/${page.value}/20?genres=${route.params.id}`)
+    getData(`https://music-player.liara.run/${route.params.id}`)
 }
 
 loadMore()
@@ -102,7 +101,8 @@ useHead({
                 </div>
                 <div class="flex justify-center pt-4">
                     <button v-wave @click="loadMore"
-                        class="bg-transparent animate-bounce text-[#e0e0e1] p-2 -ml-2 rounded-full border-none w-12 h-12 flex justify-center flex-col gap-y-1.5">
+                    
+                        class="!hidden bg-transparent animate-bounce text-[#e0e0e1] p-2 -ml-2 rounded-full border-none w-12 h-12 flex justify-center flex-col gap-y-1.5">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                             class="m-auto">
                             <path

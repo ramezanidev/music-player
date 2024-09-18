@@ -7,7 +7,7 @@ const isShowPlayList = computed(() => {
     return Boolean(route.params.id)
 });
 
-const playList = ['Pop', 'Hip Hop', 'Rock', 'Classical']
+const playList = ['new', 'happy', 'sad']
 useHead({
     title: 'Top genres'
 })
@@ -39,7 +39,7 @@ const store = usePlayerStore()
             <div class="flex-auto pt-4 mt-4 overflow-auto scrollbar-thin pb-25">
                 <div class="grid grid-cols-1 gap-4 scroll-smooth">
                     <router-link v-for="(item) in playList" :key="item" :to="`/play-list/${item}`"
-                        class="w-full h-16 flex flex-col items-start justify-end p-3 box-border overflow-hidden play-list-item rounded-lg shadow-md">
+                        class="w-full capitalize h-16 flex flex-col items-start justify-end p-3 box-border overflow-hidden play-list-item rounded-lg shadow-md">
                         <p class="text-white overflow-ellipsis overflow-hidden whitespace-nowrap">{{ item }}</p>
                     </router-link>
                 </div>

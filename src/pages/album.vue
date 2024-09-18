@@ -12,7 +12,7 @@ const getData = async (url: string) => {
   loading.value = true;
   try {
     const { data } = await axios.get(url)
-    result.value = [...result.value, ...data.results]
+    result.value = [...result.value, ...data.data]
     fetchError.value = false
   } catch (error) {
     fetchError.value = true
@@ -20,7 +20,7 @@ const getData = async (url: string) => {
     loading.value = false;
   }
 }
-getData('https://api-beta.melobit.com/v1/album/latest/all/0/4')
+getData('https://music-player.liara.run/albums')
 // ----------------------------
 const route = useRoute()
 const isShowAlbumPlayList = computed(() => {
@@ -85,7 +85,7 @@ const store = usePlayerStore()
       <div v-else-if="result.length" class="flex-auto pt-4 mt-4 overflow-auto scrollbar-thin pb-25">
         <div class="grid grid-cols-2 gap-4 scroll-smooth">
           <MusicItem v-for="(album, index) in result" :key="index" :to="`/album/${album.id}`"
-            :img="album.image.thumbnail_small.url" :title="album.name" :artist="album.artists[0].fullName"
+            :img="album.cover" :title="album.name" :artist="album.artists[0].fullName"
             :artistId="album.artists[0].id" />
         </div>
       </div>

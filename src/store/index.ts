@@ -45,13 +45,14 @@ export const usePlayerStore = defineStore("player", {
     getCurrentMusic(state) {
       const currentMusic = state.playList[state.currentMusicIndex];
       return {
-        cover: currentMusic?.image?.thumbnail_small?.url ?? "",
-        src: currentMusic?.audio?.medium?.url ?? "",
+        cover: currentMusic?.cover ?? "",
+        src: currentMusic?.url ?? "",
         id: currentMusic?.id ?? "",
         duration: currentMusic?.duration ?? 0,
-        title: currentMusic?.title ?? "",
-        artist: currentMusic?.artists[0]?.fullName ?? "",
-        album: currentMusic?.album?.name ?? "",
+        title: currentMusic?.name ?? "",
+        artist: currentMusic?.artist ?? "",
+        lyrics: currentMusic?.lyrics ?? "",
+        album: currentMusic?.album ?? "",
       };
     },
     getPlayingId(): string {
