@@ -31,7 +31,7 @@
                         </span>
                     </div>
                     <div class="flex items-center">
-                        <button @click="toggleShowLyrics" v-memo="[lyrics]" v-show="!lyrics.isEmpty"
+                        <button @click="toggleShowLyrics" v-memo="[store.getCurrentMusic.lyrics, isShowLyrics]" v-show="store.getCurrentMusic.lyrics"
                             class="w-12 h-12 flex overflow-hidden rounded-full border-none bg-transparent text-[#fff]"
                             v-wave>
                             <svg class="m-auto" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -67,9 +67,9 @@
                         </button>
                     </div>
                 </div>
-                <div v-memo="[lyrics, isShowLyrics]" :class="{'!h-[calc(100%-50px)] !opacity-100 !mt-2 !pb-2':isShowLyrics}" class="opacity-0 h-0 mt-0 pb-0 bg-[#131218] flex overflow-y-auto scrollbar-thin transition-all duration-[450ms]">
-                    <pre class="text-center text-sm text-white w-[19rem] mx-auto py-2"
-                        dir="rtl">{{ lyrics.isLoading ? 'Loading lyrics ...' : lyrics.value }}</pre>
+                <div v-memo="[store.getCurrentMusic, isShowLyrics]" :class="{'!h-[calc(100%-50px)] !opacity-100 !mt-2 !pb-2':isShowLyrics}" class="opacity-0 h-0 mt-0 pb-0 bg-[#131218] flex overflow-y-auto scrollbar-thin transition-all duration-[450ms]">
+                    <pre class="text-center whitespace-pre-line text-sm text-white w-[19rem] mx-auto py-2"
+                        >{{ store.getCurrentMusic.lyrics }}</pre>
                 </div>
             </div>
         </div>
@@ -216,40 +216,6 @@ const isShowLyrics = useLocalStorage('show-lyrics', true)
 const toggleShowLyrics = () => {
     isShowLyrics.value = !isShowLyrics.value
 }
-
-const lyrics = reactive({
-    isLoading: false,
-    value: '',
-    isError: false,
-    isEmpty: false
-})
-
-watch([isFullScreen, () => store.currentMusicIndex, isShowLyrics], async () => {
-    if (isFullScreen.value && isShowLyrics.value) {
-        const id = store.getCurrentMusic.id;
-        const url = `https://api-beta.melobit.com/v1/song/${id}`;
-
-        lyrics.isLoading = true;
-        lyrics.isError = false;
-        lyrics.isEmpty = false;
-        lyrics.value = "";
-
-        try {
-            const { data } = await axios.get(url)
-            if (data.lyrics) {
-                lyrics.value = data.lyrics
-            } else {
-                lyrics.isEmpty = false
-            }
-        } catch (error) {
-            lyrics.isError = true;
-            lyrics.isEmpty = true
-
-        } finally {
-            lyrics.isLoading = false;
-        }
-    }
-})
 
 const classAttrs = reactive({
     wrapper: computed(() => {

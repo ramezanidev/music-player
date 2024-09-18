@@ -24,19 +24,19 @@ const music = computed(() => props.music)
 <template>
     <div class="w-full text-[#e0e0e1] flex h-16 overflow-hidden">
         <img draggable="false" class="rounded-lg select-none object-center object-cover w-16 h-16"
-            :src="music.image.thumbnail_small.url" />
+            :src="music.cover" />
         <div class="flex select-none items-baseline w-[calc(100%-11.5rem)] flex-col ml-2 justify-between py-0.5">
             <p class="text-white w-full overflow-ellipsis overflow-hidden whitespace-nowrap">{{
                     music.title
             }}</p>
-            <router-link :to="`/artist/${music.artists[0].id}`" class="text-xs !justify-start !h-auto text-[#fcab14]">
-                {{ music.artists[0].fullName}}
+            <router-link :to="`/artist/${music.artist_id}`" class="text-xs !justify-start !h-auto text-[#fcab14]">
+                {{ music.artist}}
             </router-link>
             <span class="text-xs text-[#bcbcbe]">{{ useTimeFormat(music.duration) }}</span>
 
         </div>
         <div class="ml-auto flex items-center gap-x-2">
-            <a v-wave :href="music.audio.medium.url" :download="music.audio.medium.url"
+            <a v-wave :href="music.url" :download="music.url"
                 class="bg-transparent text-[#e0e0e1] p-2.5 rounded-full border-none w-10 h-10 flex justify-center flex-col gap-y-1.5 p-1">
                 <svg width="24" class="m-auto" height="24" viewBox="0 0 24 24" fill="none"
                     xmlns="http://www.w3.org/2000/svg">

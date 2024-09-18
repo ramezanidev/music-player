@@ -36,7 +36,7 @@ watch([searchInput, searchFilter], async () => {
   }
 })
 // ---------------------------------
-const navLabels = ['New', 'Dance', 'Happy', 'Sad'];
+const navLabels = ['New', 'Happy', 'Sad'];
 const activeLabel = ref(navLabels[0])
 const loading = ref(false)
 const fetchError = ref(false)
@@ -46,7 +46,8 @@ const getData = async (url: string) => {
   loading.value = true;
   try {
     const { data } = await axios.get(url)
-    result.value = data.results
+    console.log(data);
+    result.value = data.data;
     fetchError.value = false
   } catch (error) {
     fetchError.value = true
@@ -57,13 +58,11 @@ const getData = async (url: string) => {
 
 watch(activeLabel, (newValue) => {
   if (newValue === navLabels[0]) {
-    getData('https://api-beta.melobit.com/v1/song/top/week/0/50')
+    getData("https://music-player.liara.run/new")
   } else if (newValue === navLabels[1]) {
-    getData('https://api-beta.melobit.com/v1/song/mood/dance/0/50')
+    getData('https://music-player.liara.run/happy')
   } else if (newValue === navLabels[2]) {
-    getData('https://api-beta.melobit.com/v1/song/mood/happy/0/50')
-  } else if (newValue === navLabels[3]) {
-    getData('https://api-beta.melobit.com/v1/song/mood/sad/0/50')
+    getData('https://music-player.liara.run/sad')
   }
 }, { immediate: true })
 // ---------------------------------
@@ -132,7 +131,7 @@ useHead({
       </button>
     </header>
     <!-- search box -->
-    <div class="w-full !flex-col flex mt-6 transition-all overflow-hidden h-12 opacity-100 duration-300 items-center"
+    <div class="w-full !flex-col !hidden flex mt-6 transition-all overflow-hidden h-12 opacity-100 duration-300 items-center"
       :class="[{ '!fixed inset-0 bg-[#131218] !mt-16 z-20 p-4 !h-full pt-6 box-border !items-start': isFullScreenSearch }, { 'h-0 mt-0 opacity-0': !isShowSearchBox }]">
       <form @submit.prevent class="relative w-full" id="searchForm" autocomplete="off">
         <input @focus="onFullScreenSearch" @click="onFullScreenSearch" v-model="searchInput" type="search"
@@ -165,7 +164,7 @@ useHead({
         <li v-if="searchFilter === 'Song'" v-memo="[store.getPlayingId === song.id]"
           v-for="(song, index) in searchResult" :key="song.id"
           class="flex py-1 px-1.5 border border-t-[#232128] border-solid items-center text-[#ddd] text-sm h-12 overflow-hidden">
-          <img class="w-12 h-12 object-center object-cover rounded" :src="song.image.thumbnail_small.url">
+          <img class="w-12 h-12 object-center object-cover rounded" :src="song.cover">
           <div class="ml-2 flex flex-col items-baseline w-[calc(100%-10rem)]">
             <p class="text-white w-full overflow-ellipsis overflow-hidden whitespace-nowrap">{{
                 song.title
@@ -175,7 +174,7 @@ useHead({
             </router-link>
           </div>
           <div class="ml-auto flex items-center gap-x-2">
-            <a v-wave :href="song.audio.medium.url" :download="song.audio.medium.url"
+            <a v-wave :href="song.url" :download="song.url"
               class="bg-transparent text-[#e0e0e1] p-2.5 rounded-full border-none w-10 h-10 flex justify-center flex-col gap-y-1.5 p-1">
               <svg width="24" class="m-auto" height="24" viewBox="0 0 24 24" fill="none"
                 xmlns="http://www.w3.org/2000/svg">
@@ -202,22 +201,22 @@ useHead({
         <router-link v-if="searchFilter === 'Album'" :to="`/album/${album.id}`" v-for="(album, index) in searchResult"
           :key="album.name + index"
           class="flex py-1 px-1.5 border w-full justify-start border-t-[#232128] border-solid items-center text-[#ddd] text-sm h-12 overflow-hidden">
-          <img class="w-12 h-12 object-center object-cover rounded" :src="album.image.thumbnail_small.url">
+          <img class="w-12 h-12 object-center object-cover rounded" :src="album.cover">
           <span class="ml-2">{{ album.name }}</span>
         </router-link>
         <router-link v-if="searchFilter === 'Artist'" :to="`/artist/${artist.id}`"
           v-for="(artist, index) in searchResult" :key="artist.fullName + index"
           class="flex py-1 px-1.5 border w-full justify-start border-t-[#232128] border-solid items-center text-[#ddd] text-sm h-12 overflow-hidden">
-          <img class="w-12 h-12 object-center object-cover rounded" :src="artist.image.thumbnail_small.url">
+          <img class="w-12 h-12 object-center object-cover rounded" :src="artist.cover">
           <span class="ml-2">{{ artist.fullName }}</span>
         </router-link>
       </ul>
     </div>
     <!-- body -->
-    <section class="mt-4 h-[calc(100%-7.6rem)] flex-col flex duration-300 transition-all"
+    <section class="mt-4 h-[calc(100%-3rem)] flex-col flex duration-300 transition-all"
       :class="[{ 'mt-22': isFullScreenSearch }, { '!h-[calc(100%-2rem)] !mt-0': !isShowSearchBox }]">
       <nav
-        class="grid grid-cols-4 min-h-12 h-12 overflow-hidden border-t-0 border-l-0 border-r-0 border-b border-solid border-[#232128]">
+        class="grid grid-cols-3 min-h-12 h-12 overflow-hidden border-t-0 border-l-0 border-r-0 border-b border-solid border-[#232128]">
         <button :disabled="loading" v-wave="!loading" v-for="label in navLabels"
           v-memo="[activeLabel === label, loading]" :key="label"
           :class="{ 'active !opacity-100': label === activeLabel }" @click="activeLabel = label"
@@ -258,8 +257,8 @@ useHead({
       <div v-else-if="result.length" class="flex-auto pt-4 mt-4 overflow-auto scrollbar-thin pb-25"
         @scroll="onScrollPlayList">
         <div class="grid grid-cols-2 gap-4 scroll-smooth" v-memo="[result]">
-          <MusicItem v-for="(music, index) in result" :key="index" :img="music.image.thumbnail_small.url"
-            :title="music.title" :id="music.id" :artist="music.artists[0].fullName" :artistId="music.artists[0].id"
+          <MusicItem v-for="(music, index) in result" :key="index" :img="music.cover"
+            :title="music.name" :id="music.id" :artist="music.artist" :artistId="music.artist_id"
             @click="(store.getPlayingId === music.id) ? store.changePlayPause() : play(result, index)" />
         </div>
       </div>

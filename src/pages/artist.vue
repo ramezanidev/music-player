@@ -10,7 +10,7 @@ const getData = async (url: string) => {
   loading.value = true;
   try {
     const { data } = await axios.get(url)
-    result.value = data.results
+    result.value = data.data
     fetchError.value = false
   } catch (error) {
     fetchError.value = true
@@ -18,7 +18,7 @@ const getData = async (url: string) => {
     loading.value = false;
   }
 }
-getData('https://api-beta.melobit.com/v1/artist/trending/0/4')
+getData('https://music-player.liara.run/artists')
 // ----------------------------
 const route = useRoute()
 const isShowArtistPlayList = computed(() => {
@@ -85,7 +85,7 @@ const store = usePlayerStore()
             class="w-full box-border relative pt-[100%] overflow-hidden rounded-full shadow-md">
             <div class="absolute inset-0">
               <img class="absolute inset-0 select-none object-center object-cover w-full h-full"
-                :src="artist.image.thumbnail_small.url" />
+                :src="artist.cover" />
               <div
                 class="absolute select-none inset-0 py-2 px-3 bg-gradient-to-t from-[#000] flex flex-col justify-end items-center">
                 <p

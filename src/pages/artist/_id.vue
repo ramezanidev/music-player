@@ -15,12 +15,13 @@ const artist = reactive({
 const getData = async () => {
     loading.value = true;
     try {
-        const artistInfo = await axios.get('https://api-beta.melobit.com/v1/artist/byId/' + route.params.id)
-        const artistAlbums = await axios.get('https://api-beta.melobit.com/v1/artist/albums/' + route.params.id + '/0/5')
-        const artistTopSong = await axios.get('https://api-beta.melobit.com/v1/artist/songs/top/' + route.params.id + '/0/5')
-        artist.info = artistInfo.data
-        artist.albums = artistAlbums.data.results
-        artist.songs = artistTopSong.data.results
+        const artistInfo = await axios.get('https://music-player.liara.run/artist/' + route.params.id)
+        // const artistAlbums = await axios.get('https://api-beta.melobit.com/v1/artist/albums/' + route.params.id + '/0/5')
+        const artistTopSong = await axios.get('https://music-player.liara.run/artist-song/' + route.params.id)
+        artist.info = artistInfo.data.data
+        // artist.albums = artistAlbums.data.results
+        artist.songs = artistTopSong.data.data
+        console.log(artist.songs)
         fetchError.value = false
     } catch (error) {
         fetchError.value = true
@@ -31,31 +32,31 @@ const getData = async () => {
 const route = useRoute()
 getData()
 // ----------------------------
-const loadedMoreSongs = ref(false)
+const loadedMoreSongs = ref(true)
 const errorOnLoadMoreSongs = ref(false)
-const loadMoreSongs = async () => {
-    try {
-        const { data } = await axios.get('https://api-beta.melobit.com/v1/artist/songs/' + route.params.id + '/0/100')
-        artist.songs = [...artist.songs, ...data.results]
-    } catch (error) {
-        errorOnLoadMoreSongs.value = true
-    } finally {
-        loadedMoreSongs.value = true;
-    }
-}
+// const loadMoreSongs = async () => {
+//     try {
+//         const { data } = await axios.get('https://api-beta.melobit.com/v1/artist/songs/' + route.params.id + '/0/100')
+//         artist.songs = [...artist.songs, ...data.results]
+//     } catch (error) {
+//         errorOnLoadMoreSongs.value = true
+//     } finally {
+//         loadedMoreSongs.value = true;
+//     }
+// }
 // ------------------------------
-const loadedMoreAlbums = ref(false)
+const loadedMoreAlbums = ref(true)
 const errorOnLoadMoreAlbums = ref(false)
-const loadMoreAlbums = async () => {
-    try {
-        const { data } = await axios.get('https://api-beta.melobit.com/v1/artist/albums/' + route.params.id + '/0/100')
-        artist.albums = [...artist.albums, ...data.results]
-    } catch (error) {
-        errorOnLoadMoreAlbums.value = true
-    } finally {
-        loadedMoreAlbums.value = true;
-    }
-}
+// const loadMoreAlbums = async () => {
+//     try {
+//         const { data } = await axios.get('https://api-beta.melobit.com/v1/artist/albums/' + route.params.id + '/0/100')
+//         artist.albums = [...artist.albums, ...data.results]
+//     } catch (error) {
+//         errorOnLoadMoreAlbums.value = true
+//     } finally {
+//         loadedMoreAlbums.value = true;
+//     }
+// }
 // ------------------------------
 const isShowHeader = ref(false)
 const onScroll = (event: any) => {
@@ -85,7 +86,7 @@ useHead({
             <div v-if="loading" class="absolute inset-0 bg-[#232128] animate-pulse"></div>
             <div class="absolute inset-0  z-20" :class="{ 'header': isShowHeader }">
                 <img class="w-full h-full object-cover object-center" v-if="artist.info"
-                    :src="artist.info.image.cover_small.url">
+                    :src="artist.info.cover">
                 <div class="absolute inset-0 bg-gradient-to-t from-[#000] from-opacity-75"></div>
                 <div v-if="artist.info" class="absolute inset-0 flex flex-col justify-end p-4">
                     <span
@@ -125,10 +126,10 @@ useHead({
             <ul class=" border box-border border-[#232128] border-solid rounded-lg overflow-hidden w-full list-none">
                 <li v-for="(song, index) in artist.songs" v-memo="[song.id === store.getPlayingId]" @click="play([song], 0)" :key="index"
                     class="flex py-1 px-1.5 border border-t-[#232128] border-solid items-center text-[#ddd] text-sm h-12 overflow-hidden">
-                    <img class="w-12 h-12 object-center object-cover rounded" :src="song.image.thumbnail_small.url">
+                    <img class="w-12 h-12 object-center object-cover rounded" :src="song.cover">
                     <span class="ml-2">{{ song.title }}</span>
                     <div class="ml-auto flex items-center gap-x-2">
-                        <a v-wave @click.stop :href="song.audio.medium.url" :download="song.audio.medium.url"
+                        <a v-wave @click.stop :href="song.url" :download="song.url"
                             class="bg-transparent text-[#e0e0e1] p-2.5 rounded-full border-none w-10 h-10 flex justify-center flex-col gap-y-1.5 p-1">
                             <svg width="24" class="m-auto" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -183,7 +184,7 @@ useHead({
             <ul class=" border box-border border-[#232128] border-solid rounded-lg overflow-hidden w-full list-none">
                 <router-link :to="`/album/${album.id}`" v-memo="[artist.albums]" v-for="(album, index) in artist.albums" :key="index"
                     class="flex py-1 px-1.5 border w-full justify-start border-t-[#232128] border-solid items-center text-[#ddd] text-sm h-12 overflow-hidden">
-                    <img class="w-12 h-12 object-center object-cover rounded" :src="album.image.thumbnail_small.url">
+                    <img class="w-12 h-12 object-center object-cover rounded" :src="album.cover">
                     <span class="ml-2">{{ album.name }}</span>
                     <svg class="ml-auto mr-4" width="16" height="16" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
